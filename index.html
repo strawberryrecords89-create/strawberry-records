@@ -697,17 +697,14 @@
   <p class="section-label">Get In Touch</p>
   <h2 class="section-title fade-up">Contact</h2>
   <div class="contact-layout">
-    <form class="contact-form fade-up" onsubmit="return false;">
-      <div class="form-field"><label class="form-label">Name</label><input class="form-input" type="text" placeholder="Your Name"></div>
-      <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="your@email.com"></div>
-      <div class="form-field"><label class="form-label">Subject</label><input class="form-input" type="text" placeholder="件名"></div>
-      <div class="form-field"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="メッセージをどうぞ..."></textarea></div>
-      <button class="btn" type="submit">Send Message →</button>
-    </form>
+    <div class="contact-form fade-up" style="display:flex;flex-direction:column;justify-content:center;gap:24px;">
+      <p style="font-size:0.85rem;line-height:2;color:rgba(240,234,214,0.5);">ご予約・取材・その他のお問い合わせは<br>メールにてお気軽にどうぞ。</p>
+      <a href="mailto:strawberryrecords1985@gmail.com" class="btn" style="text-align:center;display:block;">SEND EMAIL →</a>
+    </div>
     <div class="contact-info fade-up">
       <strong>Label</strong><p>STRAWBERRY RECORDS</p>
       <strong>Location</strong><p>Tokyo, Japan</p>
-      <strong>Booking / Press</strong><p><a href="mailto:strawberryrecords1985@gmail.com" style="color:inherit;">strawberryrecords1985@gmail.com</a></p>
+      <strong>Booking / Press</strong><p><a href="/cdn-cgi/l/email-protection#562522243721343324242f24333539243225676f6e6316313b373f3a7835393b" style="color:inherit;"><span class="__cf_email__" data-cfemail="31424543504653544343484354525e4355420008090471565c50585d1f525e5c">[email&#160;protected]</span></a></p>
       <strong>Instagram</strong><p><a href="https://www.instagram.com/strawberry_records_official/" target="_blank" style="color:inherit;">@strawberry_records_official</a></p>
       <strong>Facebook</strong><p><a href="https://www.facebook.com/people/Strawberry-Records/100083141292116/" target="_blank" style="color:inherit;">Strawberry Records</a></p>
     </div>
@@ -728,7 +725,7 @@
   </ul>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   function toggleMenu() {
     var btn = document.getElementById('hamburger');
     var menu = document.getElementById('mobileMenu');
@@ -743,14 +740,4 @@
   // トップに戻るボタン
   var backToTop = document.getElementById('backToTop');
   window.addEventListener('scroll', function() {
-    if (window.scrollY > 400) {
-      backToTop.classList.add('visible');
-    } else {
-      backToTop.classList.remove('visible');
-    }
-  });
-  backToTop.addEventListener('click', function(e) {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-</script>
+    if (window.scroll
