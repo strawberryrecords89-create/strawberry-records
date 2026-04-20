@@ -487,9 +487,9 @@
       <li><a href="#contact">Contact</a></li>
       <li><a href="https://strawberrylp.official.ec/" target="_blank" style="color:var(--red);border-color:var(--red);">Shop</a></li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="メニュー" onclick="toggleMenu()">
+    <div class="hamburger" id="hamburger" aria-label="メニュー" role="button" tabindex="0">
       <span></span><span></span><span></span>
-    </button>
+    </div>
   </div>
 </nav>
 
@@ -799,6 +799,16 @@
 </footer>
 
 <script>
+  // ハンバーガーメニュー
+  var hamburgerBtn = document.getElementById('hamburger');
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', toggleMenu);
+    hamburgerBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      toggleMenu();
+    });
+  }
+
   // メールアドレス組み立て（Cloudflare対策）
   var u = 'strawberryrecords1985';
   var d = 'gmail.com';
