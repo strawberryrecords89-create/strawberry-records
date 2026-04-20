@@ -801,25 +801,6 @@
 </footer>
 
 <script>
-  // ハンバーガーメニュー
-  var hamburgerBtn = document.getElementById('hamburger');
-  if (hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', toggleMenu);
-    hamburgerBtn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      toggleMenu();
-    });
-  }
-
-  // メールアドレス組み立て（Cloudflare対策）
-  var u = 'strawberryrecords1985';
-  var d = 'gmail.com';
-  var m = u + '@' + d;
-  var btn = document.getElementById('send-email-btn');
-  if (btn) { btn.href = 'mailto:' + m; }
-  var bk = document.getElementById('booking-email');
-  if (bk) { bk.href = 'mailto:' + m; bk.textContent = m; }
-
   function toggleMenu() {
     var menu = document.getElementById('mobileMenu');
     var btn = document.getElementById('hamburger');
@@ -836,8 +817,53 @@
     document.getElementById('hamburger').classList.remove('open');
   }
 
-  // トップに戻るボタン
-  var backToTop = document.getElementById('backToTop');
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > 400) {
-      backToTop
+  window.addEventListener('DOMContentLoaded', function() {
+    // ハンバーガーメニュー
+    var hamburgerBtn = document.getElementById('hamburger');
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', toggleMenu);
+      hamburgerBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        toggleMenu();
+      });
+    }
+
+    // メールアドレス組み立て（Cloudflare対策）
+    var u = 'strawberryrecords1985';
+    var d = 'gmail.com';
+    var m = u + '@' + d;
+    var emailBtn = document.getElementById('send-email-btn');
+    if (emailBtn) { emailBtn.href = 'mailto:' + m; }
+    var bk = document.getElementById('booking-email');
+    if (bk) { bk.href = 'mailto:' + m; bk.textContent = m; }
+
+    // トップに戻るボタン
+    var backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 400) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      backToTop.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // フェードインアニメーション
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-up').forEach(function(el) {
+      observer.observe(el);
+    });
+  });
+</script>
+
