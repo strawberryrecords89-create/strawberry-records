@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Archive — STRAWBERRY RECORDS</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== LIVE ARCHIVE / 可読性リビルド 2026.08 =====
+     index.html と同じトークン設計。
+     nav・page-header・footer = 黒（額縁）、本文 = 生成り C #F6F2E9 */
+
+  :root {
+    --red: #D42B2B;
+    --black: #0a0a0a;
+    --offwhite: #F0EAD6;
+    --cream: #E8DFC8;
+
+    /* 暗い帯（nav / page-header / footer） */
+    --bg: #0a0a0a;
+    --fg: #F0EAD6;
+    --fg-muted: #A8A296;
+    --fg-dim: #948E82;
+    --accent: #E8433F;
+    --accent-solid: #D42B2B;
+    --on-accent: #FFFFFF;
+    --rule: rgba(240,234,214,0.20);
+  }
+
+  /* 生成り帯（本文） */
+  .band-light {
+    --bg: #F6F2E9;
+    --fg: #141210;           /* 16.7:1 */
+    --fg-muted: #4A463E;     /*  8.7:1 */
+    --fg-dim: #5E5850;       /*  6.9:1 */
+    --accent: #B21F1F;       /*  6.1:1 */
+    --accent-solid: #B21F1F;
+    --on-accent: #F6F2E9;
+    --rule: rgba(20,18,16,0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+  body {
+    background-color: var(--black);
+    color: var(--offwhite);
+    font-family: 'Courier Prime', 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.28;
+    mix-blend-mode: overlay;
+  }
+
+  ::selection { background: var(--red); color: #fff; }
+
+  /* NAV（黒） */
+  nav {
+    position: fixed; top: 0; width: 100%;
+    z-index: 1000;
+    border-bottom: 3px solid var(--red);
+    background: var(--black);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 32px; }
+  .nav-logo { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: 1.6rem; letter-spacing: 4px; color: #E8433F; text-decoration: none; }
+  .nav-logo span { color: #F0EAD6; }
+  .nav-back {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #F0EAD6; text-decoration: none;
+    border: 2px solid #E8433F; padding: 8px 18px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-back:hover { background: #E8433F; color: #fff; }
+
+  /* PAGE HEADER（黒。ここが index の TOP に当たる額縁） */
+  .page-header {
+    padding: 150px 40px 64px;
+    text-align: center;
+    background: var(--black);
+    border-bottom: 3px solid var(--red);
+  }
+  .page-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 6px; color: #FF5B57; text-transform: uppercase; margin-bottom: 16px; }
+  .page-title { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: clamp(48px, 10vw, 100px); letter-spacing: 4px; color: #F0EAD6; line-height: 1; }
+  .page-sub { font-size: 0.95rem; letter-spacing: 2px; color: #BDB7AA; margin-top: 18px; }
+
+  /* ARCHIVE 本文（生成り） */
+  .archive-container {
+    background: var(--bg);
+    color: var(--fg);
+    padding: 72px max(40px, calc((100% - 900px) / 2)) 100px;
+  }
+
+  .event-card {
+    border: 1px solid var(--rule);
+    border-left: none;
+    padding: 40px 40px 40px 44px;
+    margin-bottom: 48px;
+    position: relative;
+    background: rgba(178,31,31,0.035);
+    box-shadow: 0 4px 18px rgba(20,18,16,0.10);
+  }
+  .event-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 6px; height: 100%;
+    background: var(--accent-solid);
+  }
+
+  .event-flyer-wrap { text-align: center; margin-bottom: 32px; }
+  .event-flyer {
+    max-width: 340px; width: 100%;
+    border: 2px solid var(--accent-solid);
+    box-shadow: 0 6px 22px rgba(20,18,16,0.22);
+  }
+
+  .event-date { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: clamp(24px, 4vw, 38px); letter-spacing: 3px; color: var(--accent); margin-bottom: 6px; line-height: 1.1; }
+  .event-venue { font-size: 0.9rem; font-weight: 700; letter-spacing: 1px; color: var(--fg-muted); margin-bottom: 12px; }
+  .event-title { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: clamp(26px, 5vw, 44px); letter-spacing: 3px; color: var(--fg); margin-bottom: 12px; line-height: 1.1; }
+  .event-lead { font-size: 0.95rem; line-height: 1.8; letter-spacing: 0.5px; color: var(--fg-muted); margin-bottom: 28px; }
+  .event-thanks {
+    font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif;
+    font-size: clamp(18px, 2.5vw, 26px);
+    letter-spacing: 5px;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .event-info-grid { display: grid; gap: 26px; margin-top: 26px; }
+  .event-info-label { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: 1.05rem; letter-spacing: 4px; color: var(--accent); margin-bottom: 10px; }
+  .event-info-body { font-size: 0.95rem; line-height: 1.8; color: var(--fg-muted); }
+  .event-band { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+  .event-band:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .event-band-name { font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: var(--fg); }
+  .event-band-note { font-size: 0.875rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .event-band-members { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.75; }
+
+  .archive-tag {
+    display: inline-block;
+    font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif;
+    font-size: 0.85rem; letter-spacing: 4px;
+    color: var(--on-accent);
+    background: var(--accent-solid);
+    border: 1px solid var(--accent-solid);
+    padding: 4px 14px;
+    margin-bottom: 24px;
+  }
+
+  /* TOP に戻る */
+  .back-to-top {
+    position: fixed; bottom: 24px; right: 24px; z-index: 500;
+    font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif;
+    font-size: 0.95rem; letter-spacing: 4px;
+    padding: 12px 20px;
+    background: #0a0a0a; color: #F0EAD6;
+    border: 2px solid #E8433F;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: opacity 0.2s, transform 0.2s, background 0.15s, color 0.15s;
+    opacity: 0; transform: translateY(20px); pointer-events: none; text-decoration: none;
+  }
+  .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .back-to-top:hover { background: #E8433F; color: #fff; }
+
+  footer {
+    border-top: 3px solid var(--red);
+    padding: 40px;
+    text-align: center;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: #BDB7AA;
+    background: #050505;
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid #FF5B57; outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-inner { padding: 10px 16px; }
+    .nav-logo { font-size: 1.2rem; letter-spacing: 2px; }
+    .nav-back { font-size: 0.78rem; padding: 7px 12px; letter-spacing: 1px; }
+    .page-header { padding: 110px 20px 44px; }
+    .archive-container { padding: 44px 20px 80px; }
+    .event-card { padding: 26px 18px 26px 22px; }
+    .event-band-members { font-size: 0.88rem; }
+    .back-to-top { bottom: 16px; right: 16px; }
+  }
+
+  /* NEWS ARCHIVE */
+  .news-item { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--rule); }
+  .news-item:first-of-type { border-top: 1px solid var(--rule); }
+  .news-date { font-size: 0.8rem; letter-spacing: 1px; color: var(--accent); font-weight: 700; padding-top: 4px; }
+  .news-tag { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; background: var(--accent-solid); color: var(--on-accent); padding: 3px 9px; margin-bottom: 8px; }
+  .news-text { font-size: 1rem; line-height: 1.75; color: var(--fg); }
+  .news-text a { color: inherit; }
+  .archive-links { text-align: center; margin-top: 56px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .archive-link {
+    font-family: 'Bebas Neue', 'Noto Sans JP', sans-serif;
+    font-size: 1.05rem; letter-spacing: 5px;
+    padding: 14px 32px; text-decoration: none;
+    background: var(--accent-solid); color: var(--on-accent);
+    border: 2px solid var(--accent-solid);
+    transition: background 0.15s, color 0.15s;
+  }
+  .archive-link:hover { background: transparent; color: var(--accent); }
+  @media (max-width: 600px) {
+    .news-item { grid-template-columns: 1fr; gap: 8px; }
+    .news-date { padding-top: 0; }
+    .news-text { font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">STRAWBERRY <span>RECORDS</span></a>
+    <a class="nav-back" href="index.html">← Back</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <p class="page-label">Archive</p>
+  <h1 class="page-title">News Archive</h1>
+  <p class="page-sub">過去のお知らせ</p>
+</div>
+
+<div class="archive-container band-light">
+
+  <div class="news-item">
+    <div class="news-date">2026.06.12</div>
+    <div><span class="news-tag">Live</span><p class="news-text">2026.7.20 新宿LOFTにて JUNIOR企画「JUNIOR 30th ANNIVERSARY」出演決定！CRACK THE MARIAN 出演。</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.04.30</div>
+    <div><span class="news-tag">Live</span><p class="news-text">「STRAWBERRY FREAK SHOW vol.1」チケット5月1日10:00よりe+にて発売開始！</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.04.17</div>
+    <div><span class="news-tag">Live</span><p class="news-text">2026.5.17 幡ヶ谷 club HEAVY SICKにて「SICK LIVE」出演決定！VIBRATE TWO FINGERS 再始動。</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.04.17</div>
+    <div><span class="news-tag">Live</span><p class="news-text">2026.6.14 渋谷チェルシーホテルにて「STRAWBERRY FREAK SHOW vol.1」開催決定！VIBRATE TWO FINGERS NEW SINGLE Release。</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.03.29</div>
+    <div><span class="news-tag">Shop</span><p class="news-text">2026.4.19 More Tea Vicar?にて「Strawberry Records POP UP SHOP」開催決定！</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.03.20</div>
+    <div><span class="news-tag">Live</span><p class="news-text">2026.5.16-17 CRACK THE MARIAN、佐賀2DAYS「OVER 60's TEDDY BOY!」出演決定！</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.03.19</div>
+    <div><span class="news-tag">Shop</span><p class="news-text"><a href="https://strawberrylp.official.ec/" target="_blank" style="color:inherit;text-decoration:underline;">STRAWBERRY RECORDS オフィシャルオンラインショップ、オープン！</a></p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.03.19</div>
+    <div><span class="news-tag">Live</span><p class="news-text">「Kopy Kats Cover Song Party!! Vol.1」開催。Thanks to everyone who came out.</p></div>
+  </div>
+  <div class="news-item">
+    <div class="news-date">2026.03.08</div>
+    <div><span class="news-tag">Label</span><p class="news-text">STRAWBERRY RECORDS オフィシャルウェブサイト、リニューアルオープン。</p></div>
+  </div>
+
+  <div class="archive-links">
+    <a class="archive-link" href="live-archive.html">Live Archive →</a>
+    <a class="archive-link" href="index.html">Back to Top →</a>
+  </div>
+
+</div>
+
+<footer>
+  © STRAWBERRY RECORDS — EST.1985 TOKYO
+</footer>
+
+<a href="#" class="back-to-top" id="backToTop">↑ TOP</a>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    var backToTop = document.getElementById('backToTop');
+    if (!backToTop) return;
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 400) { backToTop.classList.add('visible'); }
+      else { backToTop.classList.remove('visible'); }
+    });
+    backToTop.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
